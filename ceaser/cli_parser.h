@@ -1,11 +1,15 @@
 #ifndef CLI_PARSER
 #define CLI_PARSER
 
+typedef struct {
+  char* file_name;
+  unsigned key;
+} CliState;
 
 
 /* parse the command line information and return the
  * filename to apply the cipher
  */
-char* parse_command_line(int argc, char **argv);
+CliState* parse_command_line(int argc, char **argv);
 
 #endif /* CLI_PARSER */
