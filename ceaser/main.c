@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "cli_parser.h"
 #include "ceaser.h"

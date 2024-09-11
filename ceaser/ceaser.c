@@ -9,11 +9,11 @@ int is_lowercase(char c) {
 }
 
 char _encrypt_uppercase(unsigned key, char c) {
-   return ((c-'A') + key) % 26;
+   return (((c-'A') + key) % 26) + 'A';
 }
 
-char _encrypt_lowercase(unsigned key, char c) {
-  return ((c-'a') + key) % 26;
+char _encrypt_lowercase(unsigned key, char c) { 
+   return (((c-'a') + key) % 26) + 'a';
 }
 
 char encrypt(unsigned key, char c) {
