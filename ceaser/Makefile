@@ -6,3 +6,6 @@ COMPILER=gcc
 
 ceaser: main.c cli_parser.o ceaser.o
 	$(COMPILER) $(COMPILER_FLAGS) $^ -o $@
+
+clean:
+	rm *.o
