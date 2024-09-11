@@ -5,8 +5,8 @@
 
 CliState* parse_command_line(int argc, char **argv) {
   char *file_name;
-  unsigned key;
   unsigned long raw_key;
+  CliState *state;
 
   if (argc == 1) {
     fprintf(stderr, "Incorrect usage!\n");
@@ -30,4 +30,15 @@ CliState* parse_command_line(int argc, char **argv) {
     fprintf(stderr, "Key size is too big!\n");
     return NULL;
   }
+
+  state = malloc(sizeof(CliState));
+  if (state == NULL) {
+    fprintf(stderr, "Internal error: Cannot create state.\n");
+    return NULL;
+  }
+
+  state->key = (unsigned)raw_key;
+  state->file_name = file_name;
+
+  return state;
 }

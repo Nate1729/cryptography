@@ -5,25 +5,30 @@
 #include "ceaser.h"
 
 int main(int argc, char **argv) {
-  char *file_name, c;
+  char c;
   FILE* f;
+  CliState *state;
 
-  file_name = parse_command_line(argc, argv);
-
-  if (file_name == NULL) {
+  state = parse_command_line(argc, argv);
+  if (state == NULL) {
     return 1;
   }
 
-  f = fopen(file_name, "r");
+  if (state->file_name == NULL) {
+    return 1;
+  }
+
+  f = fopen(state->file_name, "r");
   if (f == NULL) {
     perror("Error opening file: ");
     return errno;
   }
 
-  c = fgetc(f);
-  while (c != EOF) {
+  for (c=fgetc(f); c != EOF; c=fgetc(f)){
+    fprintf(stdout, "%c", encrypt(state->key, c));
   }
   fclose(f);
+  free(state);
 
   return 0;
 }
