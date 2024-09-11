@@ -26,7 +26,11 @@ int main(int argc, char **argv) {
   }
 
   for (c=fgetc(f); c != EOF; c=fgetc(f)){
-    fprintf(stdout, "%c", encrypt(state->key, c));
+    if (state->op == CRYPTO_OPERATION_ENCRYPT) {
+      fprintf(stdout, "%c", encrypt(state->key, c));
+    } else if (state->op == CRYPTO_OPERATION_DECRYPT) {
+      fprintf(stdout, "%c", decrypt(state->key, c));
+    }
   }
   fclose(f);
   free(state);
