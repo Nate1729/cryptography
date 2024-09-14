@@ -4,7 +4,7 @@ COMPILER=gcc
 %.o: %.c
 	$(COMPILER) $(COMPILER_FLAGS) $^ -c
 
-ceaser: main.c cli_parser.o caesar.o
+caesar: main.c cli_parser.o caesar.o
 	$(COMPILER) $(COMPILER_FLAGS) $^ -o $@
 
 clean:
