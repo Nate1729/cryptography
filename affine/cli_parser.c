@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -7,6 +8,8 @@
 const char *command_strings[COMMAND_COUNT] = {
     "decrypt", "encrypt", "set-key", "read-key", "help"
 };
+
+const unsigned valid_linear_coefficients[12] ={1,3,5,7,9,11,15,17,19,21,23,25};
 
 static void print_info_screen() {
   unsigned i;
@@ -24,6 +27,7 @@ void parse_command_line(int argc, char **argv) {
   }
 
   AffineCipher cipher;
+  unsigned long a, b;
 
   if (!strncmp(command_strings[COMMAND_DECRYPT], argv[1], 10)) {
     /* TODO decryption */
@@ -32,8 +36,52 @@ void parse_command_line(int argc, char **argv) {
     /* TODO encryption */
     fprintf(stdout, "You selected encryption\n");
   } else if (!strncmp(command_strings[COMMAND_SET_KEY], argv[1], 10)) {
-    /* TODO set-key */
-    fprintf(stdout, "You selected set-key\n");
+    /* set-key */
+    if (argc == 2) {
+      fprintf(stderr, "set-key has 2 required parameters, a and b.\n");
+      return;
+    }
+
+    if (argc == 3) {
+      fprintf(stderr, "set-key has 2 required parameters, but only 1 was provided.\n");
+      return;
+    }
+  
+    if (argc > 4) {
+      fprintf(stderr, "set-key only accepts 2 parameters but %d were given.\n", argc-2);
+      return;
+    } 
+
+    /* strtoul can't handle if they pass the string "0" so
+     * we need to check for that explicitly
+     */
+    if (argv[2][0] == '0' && argv[2][1] == '\0') {
+      fprintf(stderr, "0 is not a valid value for a.\n");
+      return;
+    }
+    if (argv[3][0] == '0' && argv[3][1] == '\0') {
+      fprintf(stderr, "0 is not a valid value for b.\n");
+      return;
+    }
+    
+    a = strtoul(argv[2], NULL, 10) % 26;
+    b = strtoul(argv[3], NULL, 10) % 26;
+    if (!a || !b) {
+      fprintf(stderr, "One or both cipher key values are invalid.\n");
+      return;
+    }
+
+    /* a has a restricted domain since decryption requires an
+     * inverse element in the ring
+     */
+    if ((a % 2) && a != 13) {
+      cipher.a = a;
+      cipher.b = b;
+      affine_cipher_write_to_disk(&cipher, NULL);
+    } else {
+      fprintf(stderr, "a has an invalid format.\n");
+      return;
+    }
   } else if (!strncmp(command_strings[COMMAND_READ_KEY], argv[1], 10)) {
     /* read-key */
     if (argc > 2) {
@@ -46,7 +94,7 @@ void parse_command_line(int argc, char **argv) {
       return;
     }
     
-    fprintf(stdout, "Cipher key is: (%c, %c)\n", cipher.a, cipher.b);
+    fprintf(stdout, "Cipher key is: (%u, %u)\n", cipher.a, cipher.b);
   } else if (!strncmp(command_strings[COMMAND_HELP], argv[1], 10)) {
     print_info_screen(); 
   } else {

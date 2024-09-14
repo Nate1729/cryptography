@@ -5,8 +5,8 @@
 extern const char *DEFAULT_KEY_FILENAME;
 
 typedef struct {
-  char a;
-  char b;
+  unsigned a;
+  unsigned b;
 } AffineCipher;
 
 /* Write the cipher key to the provided `filename`. If the `filename`
