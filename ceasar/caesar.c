@@ -1,4 +1,4 @@
-#include "ceaser.h"
+#include "caesar.h"
 
 int is_uppercase(char c) {
   return ('A' <= c) && (c <= 'Z');
