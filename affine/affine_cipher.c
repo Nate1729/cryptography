@@ -38,7 +38,7 @@ int affine_cipher_write_to_disk(AffineCipher* cipher, char *file_name) {
   return 0;
 }
 
-int affine_cihper_read_from_disk(AffineCipher *cipher, char *filename) {
+int affine_cipher_read_from_disk(AffineCipher *cipher, char *filename) {
   unsigned long bytes_read;
   FILE *f;
   char buffer[2];
