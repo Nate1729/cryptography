@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "cli_parser.h"
+#include "affine_cipher.h"
 
 const char *command_strings[COMMAND_COUNT] = {
     "decrypt", "encrypt", "set-key", "read-key", "help"
@@ -22,6 +23,8 @@ void parse_command_line(int argc, char **argv) {
     return;
   }
 
+  AffineCipher cipher;
+
   if (!strncmp(command_strings[COMMAND_DECRYPT], argv[1], 10)) {
     /* TODO decryption */
     fprintf(stdout, "You selected decryption\n");
@@ -32,8 +35,18 @@ void parse_command_line(int argc, char **argv) {
     /* TODO set-key */
     fprintf(stdout, "You selected set-key\n");
   } else if (!strncmp(command_strings[COMMAND_READ_KEY], argv[1], 10)) {
-    /* TODO read-key */
-    fprintf(stdout, "You selected read-key\n");
+    /* read-key */
+    if (argc > 2) {
+      fprintf(stderr, "read-key doesn't support options!\n"); 
+      return;
+    }
+
+    if (affine_cipher_read_from_disk(&cipher, NULL)) {
+      fprintf(stderr, "Couldn't retrieve cipher information.\n");
+      return;
+    }
+    
+    fprintf(stdout, "Cipher key is: (%c, %c)\n", cipher.a, cipher.b);
   } else if (!strncmp(command_strings[COMMAND_HELP], argv[1], 10)) {
     print_info_screen(); 
   } else {
