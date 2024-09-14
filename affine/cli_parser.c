@@ -20,6 +20,25 @@ static void print_info_screen() {
   }
 }
 
+int apply_cipher_to_file(AffineCipher *cipher, char *filename, char (*fn_modifier)(AffineCipher *, char)) {
+  FILE *f;
+  char c;
+  
+  f = fopen(filename, "r");
+  if (!f) {
+    fprintf(stderr, "Issue reading file: %s\n", filename);
+    return 1;
+  }
+
+  c = fgetc(f);
+  while (c != EOF) {
+    fprintf(stdout, "%c", fn_modifier(cipher, c));
+    c = fgetc(f);
+  }
+
+  return 0;
+}
+
 void parse_command_line(int argc, char **argv) {
   if (argc == 1) {
     print_info_screen();
@@ -30,11 +49,31 @@ void parse_command_line(int argc, char **argv) {
   unsigned long a, b;
 
   if (!strncmp(command_strings[COMMAND_DECRYPT], argv[1], 10)) {
-    /* TODO decryption */
-    fprintf(stdout, "You selected decryption\n");
+    /* decryption */
+    if (argc > 3) {
+      fprintf(stderr, "The encrypt only accepts 1 option, filename.\n");
+      return;
+    }
+
+    if (affine_cipher_read_from_disk(&cipher, NULL)) {
+      fprintf(stderr, "Couldn't retrieve cipher key.\n");
+      return;
+    }
+
+    apply_cipher_to_file(&cipher, argv[2], affine_cipher_decrypt_char);
   } else if (!strncmp(command_strings[COMMAND_ENCRYPT], argv[1], 10)) {
-    /* TODO encryption */
-    fprintf(stdout, "You selected encryption\n");
+    /* encryption */
+    if (argc > 3) {
+      fprintf(stderr, "The encrypt command only accepts 1 option, filename.\n");
+      return;
+    }
+     
+    if (affine_cipher_read_from_disk(&cipher, NULL)) {
+      fprintf(stderr, "Couldn't retrieve cipher key.\n");
+      return;
+    }
+
+    apply_cipher_to_file(&cipher, argv[2], affine_cipher_encrypt_char);
   } else if (!strncmp(command_strings[COMMAND_SET_KEY], argv[1], 10)) {
     /* set-key */
     if (argc == 2) {

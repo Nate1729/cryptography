@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "affine_cipher.h"
 
@@ -68,4 +70,65 @@ int affine_cipher_read_from_disk(AffineCipher *cipher, char *filename) {
   cipher->a = buffer[0];
   cipher->b = buffer[1];
   return 0;
+}
+
+char affine_cipher_encrypt_char(AffineCipher *cipher, char c) {
+  /* This needs to be _at least_ 2 bytes otherwise
+   * we will overflow since we could have to do 25*26=625
+   */
+  unsigned int offset, index, encrypted_index;
+
+  if (c >= 'a' && c <= 'z') {
+    /* lowercase */
+    offset = 'a';
+  } else if (c >= 'A' && c <= 'Z') {
+    /* uppercase */
+    offset = 'A';
+  } else {
+    /* not a character we encrypt */
+    return c;
+  }
+
+  index = c - offset;
+  encrypted_index = (index*cipher->a + cipher->b) % 26;
+
+  return encrypted_index + offset;
+}
+
+char affine_cipher_decrypt_char(AffineCipher *cipher, char c) {
+  unsigned inverse_ring_elements[26] = { 0 };
+  inverse_ring_elements[1] = 1; 
+  inverse_ring_elements[3] = 9; 
+  inverse_ring_elements[5] = 21; 
+  inverse_ring_elements[7] = 15; 
+  inverse_ring_elements[9] = 3; 
+  inverse_ring_elements[11] = 19; 
+  inverse_ring_elements[15] = 7; 
+  inverse_ring_elements[17] = 23; 
+  inverse_ring_elements[19] = 11; 
+  inverse_ring_elements[21] = 5; 
+  inverse_ring_elements[23] = 17; 
+  inverse_ring_elements[25] = 25; 
+
+  unsigned encrypted_index, index, offset;
+
+  if (c >= 'a' && c <= 'z') {
+    offset = 'a';
+  } else if (c >= 'A' && c <= 'Z') {
+    offset = 'A';
+  } else {
+    /* Non encrypt/decrypt-able character
+     */
+    return c;
+  }
+
+  if (inverse_ring_elements[cipher->a % 26] == 0) {
+    fprintf(stderr, "Found invalid cipher\n");
+    exit(1);
+  }
+  
+  encrypted_index = c - offset; 
+  index = inverse_ring_elements[(cipher->a) % 26] * (encrypted_index + 26 - ((cipher->b) %26));
+
+  return (index % 26) + offset;
 }

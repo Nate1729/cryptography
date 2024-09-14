@@ -25,4 +25,7 @@ int affine_cipher_write_to_disk(AffineCipher *c, char *filename);
 int affine_cipher_read_from_disk(AffineCipher *c, char *filename);
 
 
+char affine_cipher_encrypt_char(AffineCipher *c, char plain_char);
+char affine_cipher_decrypt_char(AffineCipher *c, char plain_char);
+
 #endif /* AFFINE_CIPHER_H */
